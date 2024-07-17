@@ -34,6 +34,9 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private AddressService addressService;
+
     public Event createEvent(EventRequestDTO eventRequestDTO){
         String imgUrl = null;
 
@@ -52,6 +55,10 @@ public class EventService {
                 .build();
 
         eventRepository.save(event);
+
+        if(!eventRequestDTO.remote()) {
+            addressService.createAddress(eventRequestDTO, event);
+        }
 
         return event;
     }
@@ -81,6 +88,27 @@ public class EventService {
     public List<EventResponseDTO> getEvents(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Event> eventsPage = eventRepository.findAll(pageable);
+        return eventsPage
+                .map(event -> new EventResponseDTO(
+                                event.getId(),
+                                event.getTitle(),
+                                event.getDescription(),
+                                event.getDate(),
+                                "",
+                                "",
+                                event.getRemote(),
+                                event.getImgUrl(),
+                                event.getEventUrl()
+                        )
+
+                ).stream().toList();
+
+    }
+
+
+    public List<EventResponseDTO> getUpcomingEvents(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Event> eventsPage = eventRepository.findUpcomingEvents(new Date(), pageable);
         return eventsPage
                 .map(event -> new EventResponseDTO(
                                 event.getId(),
