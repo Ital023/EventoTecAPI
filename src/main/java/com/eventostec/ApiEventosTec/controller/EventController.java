@@ -2,6 +2,7 @@ package com.eventostec.ApiEventosTec.controller;
 
 import com.eventostec.ApiEventosTec.domain.event.Event;
 import com.eventostec.ApiEventosTec.domain.event.EventRequestDTO;
+import com.eventostec.ApiEventosTec.domain.event.EventResponseDTO;
 import com.eventostec.ApiEventosTec.domain.service.EventService;
 import com.eventostec.ApiEventosTec.repositories.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +33,16 @@ public class EventController {
         Event newEvent = eventService.createEvent(eventRequestDTO);
         return ResponseEntity.ok(newEvent);
     }
+
+    @GetMapping
+    public ResponseEntity<List<EventResponseDTO>> getEvents(@RequestParam(defaultValue = "0") int page
+            , @RequestParam(defaultValue = "10") int size){
+
+        List<EventResponseDTO> allEvents = eventService.getEvents(page, size);
+
+        return ResponseEntity.ok(allEvents);
+    }
+
+
 
 }
